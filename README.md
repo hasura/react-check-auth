@@ -265,7 +265,7 @@ It will render as `<span>Please login</span>` if the user's token is invalid and
 
 ### Using with React Native
 
-This library works with React Native exactly as it does with React. Just wrap your `Root` inside `<AuthProvider>` and you can use `<AuthConsumer>` in the children components of any depth.
+In case of React Native, you need to send the Authorization header to the `<AuthProvider>` since cookies are not cached in React Native. Rest of the workflow is exactly the same as React.
 
 ``` javascript
 
@@ -273,8 +273,14 @@ import { AuthProvider, AuthConsumer } from 'react-vksci123';
 
 export default class App extends Component<Props> {
   render() {
+    const sessionToken = AsyncStorage.getItem("@mytokenkey");
+    const reqOptions = {
+      "method": "GET",
+      "headers": sessionToken ? { "Authorization" : `Bearer ${sessionToken}` } : {}
+    }
     return (
-      <AuthProvider authUrl={`https://auth.conversion36.hasura-app.io/v1/user/info`}>
+      <AuthProvider authUrl={`https://auth.conversion36.hasura-app.io/v1/user/info`}
+      reqOptions={reqOptions}>
         <View style={styles.container}>
           <Text style={styles.welcome}>
             Welcome to React Native!
