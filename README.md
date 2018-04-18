@@ -165,7 +165,7 @@ With React Router v4, you can call the Route inside your CheckAuth component or 
 
 ```
 
-And inside your App.js component render, you can wrap it entirely with <CheckAuth>,
+And inside your App.js component render, you can wrap it entirely with `CheckAuth`,
 
 ``` javascript
 render () {
@@ -185,7 +185,7 @@ render () {
             <Route component={myApp} />
           </div>) );
       }}
-    </CheckAuth>
+    </AuthConsumer>
   }
 ```
 
