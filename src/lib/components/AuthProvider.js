@@ -15,29 +15,7 @@ class AuthProvider extends React.Component  {
   }
   componentDidMount () {
     if (this.props.authUrl) {
-      const oThis = this;
-      const options = this.props.reqOptions || {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      };
-      this.toggleLoading();
-      return fetch(this.props.authUrl, options)
-        .then(function(response) {
-          if (response.status !== 200) {
-            return response.json()
-            .then((r) => {
-              return Promise.reject(r)
-            });
-          }
-          return response.json();
-        }).then(function(json) {
-          oThis.fetchSuccess(json);
-        }).catch(function(ex) {
-          oThis.fetchFail(ex);
-        })
+      return this.fetchInfo();
     }
     return Promise.reject();
   }
@@ -51,7 +29,32 @@ class AuthProvider extends React.Component  {
     this.setState({ ...this.state, userInfo: null, isLoading: false, error: err});
   }
   refreshAuth() {
-    this.setState({ ...this.state, ...defaultState });
+    this.fetchInfo();
+  }
+  fetchInfo() {
+    const oThis = this;
+    const options = this.props.reqOptions || {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    };
+    this.toggleLoading();
+    return fetch(this.props.authUrl, options)
+      .then(function(response) {
+        if (response.status !== 200) {
+          return response.json()
+          .then((r) => {
+            return Promise.reject(r)
+          });
+        }
+        return response.json();
+      }).then(function(json) {
+        oThis.fetchSuccess(json);
+      }).catch(function(ex) {
+        oThis.fetchFail(ex);
+      });
   }
   render() {
     return (
