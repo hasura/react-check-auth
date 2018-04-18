@@ -1,7 +1,7 @@
 {
-  "name": "create-react-library",
-  "version": "1.1.0",
-  "description": "React NPM library starter kit based on Facebook's create react app",
+  "name": "react-check-auth",
+  "version": "0.1-alpha",
+  "description": "Declaratively add auth protection anywhere in your react/react-native app ",
   "main": "build/index.js",
   "scripts": {
     "start": "node scripts/start.js",
@@ -11,13 +11,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DimitriMikadze/create-react-library.git"
+    "url": "git+https://github.com/hasura/react-check-auth.git"
   },
-  "author": "Dimitri Mikadze <dimitrimikadze@gmail.com>",
+  "author": "Karthik Venkateswaran<karthik@hasura.io>",
   "bugs": {
-    "url": "https://github.com/DimitriMikadze/create-react-library/issues"
+    "url": "https://github.com/hasura/react-check-auth/issues"
   },
-  "homepage": "https://github.com/DimitriMikadze/create-react-library#readme",
+  "homepage": "https://github.com/hasura/react-check-auth#readme",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
@@ -67,8 +67,8 @@
     "whatwg-fetch": "2.0.3"
   },
   "peerDependencies": {
-    "react": ">=0.14",
-    "react-dom": ">=0.14"
+    "react": ">=16.3",
+    "react-dom": ">=16.3"
   },
   "jest": {
     "collectCoverageFrom": [
