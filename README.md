@@ -248,7 +248,7 @@ Lets assume we have an endpoint on the backend `/api/check_token` which reads a 
   </AuthProvider>
 ```
 
-It will render as `<span>Please login</span> if the user's token is invalid` and if the token is a valid one it will render <span>Hello username</span>
+It will render as `<span>Please login</span>` if the user's token is invalid and if the token is a valid one it will render <span>Hello username</span>
 
 ## Contributing
 
