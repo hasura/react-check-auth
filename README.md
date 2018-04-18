@@ -216,8 +216,39 @@ Hasura's Auth API can be integrated with this module with a simple auth get endp
   </AuthProvider>
 ```
 
-#### Auth0
+#### Custom Provider
 
+`CheckAuth` can be integrated with any custom authentication provider APIs.
+
+Lets assume we have an endpoint on the backend `/api/check_token` which reads a header `x-access-token` from the request and provides with the associated user information
+
+```
+  const authEndpoint = 'http://localhost:8080/api/check_token';
+  const reqOptions = { 
+    'method': 'GET',
+    'headers': {
+      'Content-Type': 'application/json',
+      'x-access-token': 'jwt_token'
+    }
+  };
+
+  <AuthProvider authUrl = { authEndpoint } reqOptions={ reqOptions }>
+    <AuthConsumer>
+      { ( { isLoading, userInfo, error, refreshAuth }) => {
+        if ( !userInfo ) {
+          return (
+            <span>Please login</span>
+          );
+        }
+        return (
+          <span>Hello { userInfo ? userInfo.username.name : '' }</span>
+        );
+      }}
+    </AuthConsumer>
+  </AuthProvider>
+```
+
+It will render as `<span>Please login</span> if the user's token is invalid` and if the token is a valid one it will render <span>Hello username</span>
 
 ## Contributing
 
