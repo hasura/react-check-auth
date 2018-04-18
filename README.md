@@ -1,63 +1,131 @@
 # check-auth
 
-This tiny react component helps you make auth checks declarative in your react or react-native app.
+`check-auth` is a tiny react component helps you make auth checks declarative in your react or react-native app.
+Any component can declaratively toggle based on whether the user is logged in or not.
 
+This component uses React 16's new context API. This component is just ~100LOC, it's ideal to use as boilerplate/reference of using the new context API too to pass information from a component to arbitrarily deep child components.
 
-The use-case is when:
-1. the authentication is already done and you have a cookie or a header and 
-2. you want components arbitrarily spread somewhere in your app to be able to toggle based on whether the user is logged in or not
+# Examples
 
-This component uses React 16's new context API. Considering the size of this component, it's ideal to use a boilerplate/reference of using the new context API too!
+## Example 0: Setup for web (if signin/login had set a cookie)
 
-## Example 1: Creating a header that shows a "Welcome user" or a Login button
+Wrap your react app in a `AuthProvider` component that has an endpoint to fetch basic user information. This works because if the user had logged in, a cookie would already be present. For using authorization headers, check the docs after the examples.
+
+```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+
+import {AuthProvider} from "check-auth";
+import {Header, Main} from "./components";
+
+const App = () => (
+  <AuthProvider authUrl={'https://website.com/get/userInfo'}>
+    <div>
+      // The rest of your react app goes here
+      <Header />
+      <Main />
+    </div>
+  </AuthProvider>
+);
+
+ReactDOM.render(<App />, document.getElementById("root"));
+```
+
+## Example 1: Show a "welcome user" or a Login button
+
+Now, in any arbitrary component, like a Header, you can check if the user is currently logged in. Typically you would use this for either showing a "welcome" label or a login button.
+
 ``` javascript
-  import {AuthProvider, AuthConsumer} from 'check-auth';
+  import {AuthConsumer} from 'check-auth';
 
   const Header = () => (
-    <AuthProvider authEndpoint={ 'http://localhost:8080/user/info' }>
-      // Some header items 
-      // ...
-      
-      // Now the part that depends on the user being logged in
+    <div>      
+      // Use the AuthConsumer component to check 
+      // if userInfo is available
       <AuthConsumer> 
-        {({userInfo}) => { 
-
-          // .. code to check if userInfo is not null and return the corresponding jsx
-          ...
-
-          // If userinfo doesn't exist return the corresponding jsx
-        }}
+        {({userInfo, isLoading, error}) => ( 
+          userInfo ?
+            (<span>Hi {userInfo.username}</span>) :
+            (<a href="/login">Login</a>)
+        )}
        </AuthConsumer>
-    </AuthProvider>
+    </div>
   );
 ```
 
-## Example 2: Routing with react-router based on the user being logged in
+## Example 2: Redirect routes based on the user being logged in
+
+You can mix and match `check-auth` with other declarative components like routing:
+
 ``` javascript
-  import {AuthProvider, AuthConsumer} from 'check-auth';
+  import {AuthConsumer} from 'check-auth';
 
   const Main = () => (
-    <AuthProvider authEndpoint={ 'http://localhost:8080/user/info' }>
-      // Some header items 
-      // ...
+    <Router>
+      <Route path='/home' component={Home} />
+      <Route path ='/login' component={Login} />
+    </Router>
+   );
+   
+   const Home = () => {
+     return (
+       <AuthConsumer>
+         {({userInfo}) => {
 
-      <AuthConsumer>
-
-        {({userInfo, isLoading, error}) => {
-
-          // If userInfo is not null
-          return (<Route path='/home' component={Home}/>);
-
-          // If the request is being fetched
-          return (...)
-
-          // If error occurs
-          return <Route path='/error' component={Error}/>
-        }
-
-      </AuthConsumer>
-    </AuthProvider>
+           // Redirect the user to login if they are not logged in
+           if (!userInfo) {
+              return (<Redirect to='/login' />);
+           } 
+           
+           // Otherwise render the normal component
+           else {
+             return (<div>Welcome Home!</div>);
+           }
+         }}
+       </AuthConsumer>
+     );
+   }
 );
+```
+
+
+# Usage guide
+
+### Backend requirements
+
+These are the backend requirements that are assumed by `react-check-auth`.
+
+### 1) API endpoint to return user information
+
+An API request to fetch user information. It should take a cookie, or a header or a body for current session information.
+
+For example:
+```http
+GET https://my-backend.com/api/user
+Content-Type: application/json
+Cookie: <...>
+Authorization: Bearer <...>
+```
+
+### 2) Success or logged-in response
+
+If the user is logged in, the API should return a `200` status code with a `JSON` object.
+
+For example:
+```json
+{
+  "username": "iamuser",
+  "id": 123
+}
+```
+
+### 3) Not logged-in response
+
+If the user is not logged-in, the API should return a **non `200`** status code:
+
+For example:
+```http
+Status: 403
 ```
 
 ## Installation
@@ -66,32 +134,41 @@ This component uses React 16's new context API. Considering the size of this com
 $ npm install --save check-auth
 ```
 
-## Simple Usage
+## Setting up the `AuthProvider` component that wraps your app
+
+### Use a GET endpoint with cookies
 
 ``` javascript
   import React from 'react';
-  import {AuthProvider, AuthConsumer} from 'check-auth';
+  import {AuthProvider} from 'check-auth';
 
+  const authUrl = "https://my-backend.com/verifyAuth";
+  
   const App = () => (
-    <div>
-     <AuthProvider authUrl={authUrl} reqObj={reqObj}>
-      <AuthConsumer> 
-        { ({ isLoading, userInfo, error }) => { 
-          if ( isLoading ) { 
-            return ( <span>Loading...</span> )
-          }
-          return ( !userInfo ? 
-            (<div>
-              <a href={'https://auth.commercialization66.hasura-app.io/ui?redirect_url=http://localhost:3000'}>Login</a>
-            </div>)
-            : 
-            (<div>
-              {Hello ${ userInfo.username }}
-            </div>) );
-        }}
-       </AuthConsumer>
-      </AuthProvider>
-    </div>
+    <AuthProvider authUrl={authUrl}>
+      // The rest of your app goes here
+    </AuthProvider>
+  );
+```
+
+### Use a GET endpoint with a token
+
+``` javascript
+  import React from 'react';
+  import {AuthProvider} from 'check-auth';
+
+  const authUrl = "https://my-backend.com/verifyAuth";
+  const reqOptions = { 
+    'method': 'GET',
+    'credentials': 'include',
+    'headers': {
+      'Content-Type': 'application/json'
+    },  
+  }; 
+  const App = () => (
+    <AuthProvider authUrl={authUrl}>
+      // The rest of your app goes here
+    </AuthProvider>
   );
 ```
 
