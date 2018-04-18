@@ -1,31 +1,31 @@
-# react-check-auth
+## react-check-auth
 
 `react-check-auth` is a tiny react component helps you make auth checks declarative in your react or react-native app.
 Any component can declaratively toggle based on whether the user is logged in or not.
 
 This component uses [React 16's new context API](https://reactjs.org/docs/context.html) and is just ~100 LOC. It can also serve as a boilerplate for getting familiar with using the context API to pass information from a parent component to arbitrarily deep child components.
 
-# Motivation
+## Motivation
 
 In a typical app UI, depending on whether the user logs in, components in the application display different infomration.
 
 For example, a "welcome user" label or a "login button" on a header. Or using this information with routing, `/home` should redirect to `/login` if the user is not logged in, and `/login` should redirect to `/home` if the user is logged in.
 
-## Before `react-check-auth`
+### Before `react-check-auth`
 
 1. On load, your app must make a request to some kind of a `/verifyUser` or a `/fetchUser` endpoint to check if the existing persisted token/cookie is available and valid.
 2. You need to store that information in app state and pass it as a prop all through your component tree just so that that child components can access it or use `redux` to store the state and `connect()` the consuming component.
 
-## After `react-check-auth`
+### After `react-check-auth`
 
 1. You specify the `authUrl` endpoint as a prop to a wrapper component called `<AuthProvider`.
 2. You access logged-in information by wrapping your react component/element in `<AuthConsumer>` that has the latest props.
 
 You don't need to make an API request, or pass props around, or manage state/reducers/connections in your app.
 
-# Examples
+## Examples
 
-## Example 0: Setup for web
+### Example 0: Setup for web
 
 Wrap your react app in a `AuthProvider` component that has an endpoint to fetch basic user information. This works because if the user had logged in, a cookie would already be present. For using authorization headers, check the docs after the examples.
 
@@ -49,7 +49,7 @@ const App = () => (
 ReactDOM.render(<App />, document.getElementById("root"));
 ```
 
-## Example 1: Show a "welcome user" or a Login button
+### Example 1: Show a "welcome user" or a Login button
 
 Now, in any arbitrary component, like a Header, you can check if the user is currently logged in. Typically you would use this for either showing a "welcome" label or a login button.
 
@@ -71,7 +71,7 @@ Now, in any arbitrary component, like a Header, you can check if the user is cur
   );
 ```
 
-## Example 2: Redirect routes based on the user being logged in
+### Example 2: Redirect routes based on the user being logged in
 
 You can mix and match `react-check-auth` with other declarative components like routing:
 
@@ -107,13 +107,13 @@ You can mix and match `react-check-auth` with other declarative components like 
 ```
 
 
-# Usage guide
+## Usage guide
 
-## Backend requirements
+### Backend requirements
 
 These are the backend requirements that are assumed by `react-check-auth`.
 
-### 1) API endpoint to return user information
+#### 1) API endpoint to return user information
 
 An API request to fetch user information. It should take a cookie, or a header or a body for current session information.
 
@@ -125,7 +125,7 @@ Cookie: <...>
 Authorization: Bearer <...>
 ```
 
-### 2) Success or logged-in response
+#### 2) Success or logged-in response
 
 If the user is logged in, the API should return a `200` status code with a `JSON` object.
 
@@ -137,7 +137,7 @@ For example:
 }
 ```
 
-### 3) Not logged-in response
+#### 3) Not logged-in response
 
 If the user is not logged-in, the API should return a **non `200`** status code:
 
@@ -146,13 +146,13 @@ For example:
 Status: 403
 ```
 
-## Installation
+### Installation
 
 ``` bash
 $ npm install --save @hasura/react-check-auth
 ```
 
-## Set up `AuthProvider`
+### Set up `AuthProvider`
 
 The `AuthProvider` component should be at the top of the component tree so that any other component in the app can consume the `userInfo` information.
 
@@ -162,11 +162,11 @@ The `AuthProvider` takes a required prop called `authUrl` and an optional prop c
 <AuthProvider authUrl="https://my-backend.com/api/user" reqOptions={requestOptionsObject} />
 ```
 
-#### `authUrl` :: String
+##### `authUrl` :: String
 Should be a valid HTTP endpoint. Can be an HTTP endpoint of any method.
 
 
-#### `reqOptions` :: Object
+##### `reqOptions` :: Object
 Should be a valid `fetch` options object as per https://github.github.io/fetch/#options.
 
 **Note: This is an optional prop that does not need to be specified if your `authUrl` endpoint is a GET endpoint that accepts cookies.**
@@ -182,7 +182,7 @@ Default value that ensures cookies get sent to a `GET` endpoint:
 }
 ```
 
-### Example 1: Use a GET endpoint with cookies
+#### Example 1: Use a GET endpoint with cookies
 
 ``` javascript
   import React from 'react';
@@ -197,7 +197,7 @@ Default value that ensures cookies get sent to a `GET` endpoint:
   );
 ```
 
-### Example 2: Use a GET endpoint with a header
+#### Example 2: Use a GET endpoint with a header
 
 ``` javascript
   import React from 'react';
@@ -219,7 +219,7 @@ Default value that ensures cookies get sent to a `GET` endpoint:
   );
 ```
 
-## Consuming auth state with `<AuthConsumer>`
+### Consuming auth state with `<AuthConsumer>`
 
 Any react component or element can be wrapped with an `<AuthConsumer>` to consume the latest contextValue. You must write your react code inside a function that accepts the latest contextValue. Whenver the contextValue is updated then the AuthComponent is automatically re-rendered.
 
@@ -235,23 +235,23 @@ For example,
 </AuthConsumer>
 ```
 
-#### `props.userInfo` :: JSON
+##### `props.userInfo` :: JSON
 
 If the API call returned a 200 meaning that the current session is valid, `userInfo` contains <request-object> as returned by the API.
 
 If the API call returned a non-200 meaning that the current session is absent or invalid, `userInfo` is set to `null`.
 
-#### `props.isLoading` :: Boolean
+##### `props.isLoading` :: Boolean
 
 If the API call has not returned yet, `isLoading: true`. If the API call has not been made yet, or has completed then `isLoading: false`.
 
 
-#### `props.error` :: JSON
+##### `props.error` :: JSON
 
 If the API call returned a non-200 or there was an error in making the API call itself, `error` contains the parsed JSON value.
 
 
-## Refresh state (eg: logout)
+### Refresh state (eg: logout)
 
 If you implement a logout action in your app, the auth state needs to be updated. All you need to do is call the `refreshAuth()` function available as an argument in the renderProp function of the `AuthConsumer` component.
 
@@ -273,7 +273,7 @@ For example:
 
 This will re-run the call to `authUrl` and update all the child components accordingly.
 
-## Using with React Native
+### Using with React Native
 
 In case of React Native, you need to send the Authorization header to the `<AuthProvider>` since cookies are not cached in React Native. Rest of the workflow is exactly the same as React.
 
@@ -323,7 +323,7 @@ export default class App extends Component<Props> {
 
 All Auth backend providers provide an endpoint to verify a "session" and fetch user information. This package itself was motivated by making it easier to integrate Hasura's auth API into your react app and minimise boilerplate. That said this package is meant to be used with any auth provider, including your own.
 
-#### Hasura
+### Hasura
 
 Hasura's Auth API can be integrated with this module with a simple auth get endpoint  and can also be used to redirect the user to Hasura's Auth UI Kit in case the user is not logged in.
 
@@ -343,7 +343,7 @@ Hasura's Auth API can be integrated with this module with a simple auth get endp
 
 Read the docs here.
 
-#### Firebase
+### Firebase
 
 `CheckAuth` can be integrated with Firebase APIs.
 
@@ -362,7 +362,7 @@ Read the docs here.
   </AuthProvider>
 ```
 
-#### Custom Provider
+### Custom Provider
 
 `CheckAuth` can be integrated with any custom authentication provider APIs.
 
@@ -466,19 +466,19 @@ Runs the demo app in development mode.
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-### Source code
+#### Source code
 
 The source code for the react components are located inside `src/lib`.  
 
-### Demo app
+#### Demo app
 
 A demo-app is located inside `src/demo` directory, which you can use to test your library while developing.
 
-### Testing
+#### Testing
 
 `npm run test` or `yarn run test`
 
-### Build library
+#### Build library
 
 `npm run build` or `yarn run build`
 
