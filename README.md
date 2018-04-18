@@ -164,11 +164,11 @@ The `AuthProvider` takes a required prop called `authUrl` and an optional prop c
 <AuthProvider authUrl="https://my-backend.com/api/user" reqOptions={requestOptionsObject} />
 ```
 
-### `authUrl` :: String
+#### `authUrl` :: String
 Should be a valid HTTP endpoint. Can be an HTTP endpoint of any method.
 
 
-### `reqOptions` :: Object
+#### `reqOptions` :: Object
 Should be a valid `fetch` options object as per https://github.github.io/fetch/#options.
 
 **Note: This is an optional prop that does not need to be specified if your `authUrl` endpoint is a GET endpoint that accepts cookies.**
@@ -223,8 +223,34 @@ Default value that ensures cookies get sent to a `GET` endpoint:
 
 ## Consuming auth state with `<AuthConsumer>`
 
-...
+Any react component or element can be wrapped with an `<AuthConsumer>` to consume the latest contextValue. You must write your react code inside a function that accepts the latest contextValue. Whenver the contextValue is updated then the AuthComponent is automatically re-rendered.
 
+For example,
+```javascript
+<AuthConsumer>
+  {(props) => {
+    
+    props.userInfo = {..}        // <request-object> returned by the API
+    props.isLoading = true/false // if the API has not returned yet
+    props.error = {..}           // <error-object> if the API returned a non-200 or the API call failed
+  }}
+</AuthConsumer>
+```
+
+#### `props.userInfo` :: JSON
+
+If the API call returned a 200 meaning that the current session is valid, `userInfo` contains <request-object> as returned by the API.
+
+If the API call returned a non-200 meaning that the current session is absent or invalid, `userInfo` is set to `null`.
+
+#### `props.isLoading` :: Boolean
+
+If the API call has not returned yet, `isLoading: true`. If the API call has not been made yet, or has completed then `isLoading: false`.
+
+
+#### `props.error` :: JSON
+
+If the API call returned a non-200 or there was an error in making the API call itself, `error` contains the parsed JSON value.
 
 
 ## Refresh state (eg: logout)
