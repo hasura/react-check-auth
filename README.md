@@ -1,7 +1,6 @@
 ## react-check-auth
 
 `react-check-auth` is a tiny react component helps you make auth checks declarative in your react or react-native app.
-Any component can declaratively toggle based on whether the user is logged in or not.
 
 This component uses [React 16's new context API](https://reactjs.org/docs/context.html) and is just ~100 LOC. It can also serve as a boilerplate for getting familiar with using the context API to pass information from a parent component to arbitrarily deep child components.
 
