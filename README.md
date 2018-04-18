@@ -23,9 +23,9 @@ For example, a "welcome user" label or a "login button" on a header. Or using th
 
 You don't need to make an API request, or pass props around, or manage state/reducers/connections in your app.
 
-## Examples
+## Example
 
-### Example 0: Setup for web
+### 1) Add AuthProvider
 
 Wrap your react app in a `AuthProvider` component that has an endpoint to fetch basic user information. This works because if the user had logged in, a cookie would already be present. For using authorization headers, check the docs after the examples.
 
@@ -49,7 +49,7 @@ const App = () => (
 ReactDOM.render(<App />, document.getElementById("root"));
 ```
 
-### Example 1: Show a "welcome user" or a Login button
+### 2) Show a "welcome user" or a Login button
 
 Now, in any arbitrary component, like a Header, you can check if the user is currently logged in. Typically you would use this for either showing a "welcome" label or a login button.
 
@@ -71,7 +71,7 @@ Now, in any arbitrary component, like a Header, you can check if the user is cur
   );
 ```
 
-### Example 2: Redirect routes based on the user being logged in
+### 3) Redirect not-logged in users to /login
 
 You can mix and match `react-check-auth` with other declarative components like routing:
 
@@ -109,7 +109,7 @@ You can mix and match `react-check-auth` with other declarative components like 
 
 ## Usage guide
 
-### Backend requirements
+### I. Backend requirements
 
 These are the backend requirements that are assumed by `react-check-auth`.
 
@@ -146,13 +146,13 @@ For example:
 Status: 403
 ```
 
-### Installation
+### II. Installation
 
 ``` bash
 $ npm install --save @hasura/react-check-auth
 ```
 
-### Set up `AuthProvider`
+### III. Set up `AuthProvider`
 
 The `AuthProvider` component should be at the top of the component tree so that any other component in the app can consume the `userInfo` information.
 
@@ -219,7 +219,7 @@ Default value that ensures cookies get sent to a `GET` endpoint:
   );
 ```
 
-### Consuming auth state with `<AuthConsumer>`
+### IV. Consuming auth state with `<AuthConsumer>`
 
 Any react component or element can be wrapped with an `<AuthConsumer>` to consume the latest contextValue. You must write your react code inside a function that accepts the latest contextValue. Whenver the contextValue is updated then the AuthComponent is automatically re-rendered.
 
@@ -251,7 +251,7 @@ If the API call has not returned yet, `isLoading: true`. If the API call has not
 If the API call returned a non-200 or there was an error in making the API call itself, `error` contains the parsed JSON value.
 
 
-### Refresh state (eg: logout)
+### V. Refresh state (eg: logout)
 
 If you implement a logout action in your app, the auth state needs to be updated. All you need to do is call the `refreshAuth()` function available as an argument in the renderProp function of the `AuthConsumer` component.
 
@@ -273,9 +273,9 @@ For example:
 
 This will re-run the call to `authUrl` and update all the child components accordingly.
 
-### Using with React Native
+### VI. Using with React Native
 
-In case of React Native, you need to send the Authorization header to the `<AuthProvider>` since cookies are not cached in React Native. Rest of the workflow is exactly the same as React.
+Usage with React Native is exactly the same as with React. However you would typically use a Authorization header instead of cookies. Here's a quick example:
 
 ``` javascript
 
