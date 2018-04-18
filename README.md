@@ -320,13 +320,13 @@ export default class App extends Component<Props> {
 
 ## Plug-n-play with existing auth providers
 
-All Auth backend providers provide an endpoint to verify a "session" and fetch user information. This package itself was motivated by making it easier to integrate Hasura's auth API into your react app and minimise boilerplate. That said this package is meant to be used with any auth provider, including your own.
+All Auth backend providers provide an endpoint to verify a "session" and fetch user information. This component was motivated from creating documentation for integrating Hasura's auth backend into a react app with minimum boilerplate. That said this package is meant to be used with any auth provider, including your own.
 
 ### Hasura
 
 Hasura's Auth API can be integrated with this module with a simple auth get endpoint  and can also be used to redirect the user to Hasura's Auth UI Kit in case the user is not logged in.
 
-```
+```javascript
   // replace CLUSTER_NAME with your Hasura cluster name.
   const authEndpoint = 'https://auth.CLUSTER_NAME.hasura-app.io/v1/user/info';
 
@@ -346,7 +346,7 @@ Read the docs here.
 
 `CheckAuth` can be integrated with Firebase APIs.
 
-```
+```javascript
   // replace API_KEY with your Firebase API Key and ID_TOKEN appropriately.
   const authUrl = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo?key=[API_KEY]';
   const reqObject = { 'method': 'POST', 'payload': {'idToken': '[ID_TOKEN]'}, 'headers': {'content-type': 'application/json'}};
@@ -367,7 +367,7 @@ Read the docs here.
 
 Lets assume we have an endpoint on the backend `/api/check_token` which reads a header `x-access-token` from the request and provides with the associated user information
 
-```
+```javascript
   const authEndpoint = 'http://localhost:8080/api/check_token';
   const reqOptions = { 
     'method': 'GET',
