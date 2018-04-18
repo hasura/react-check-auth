@@ -273,6 +273,51 @@ For example:
 
 This will re-run the call to `authUrl` and update all the child components accordingly.
 
+## Using with React Native
+
+In case of React Native, you need to send the Authorization header to the `<AuthProvider>` since cookies are not cached in React Native. Rest of the workflow is exactly the same as React.
+
+``` javascript
+
+import { AuthProvider, AuthConsumer } from 'react-vksci123';
+
+export default class App extends Component<Props> {
+  render() {
+    const sessionToken = AsyncStorage.getItem("@mytokenkey");
+    const reqOptions = {
+      "method": "GET",
+      "headers": sessionToken ? { "Authorization" : `Bearer ${sessionToken}` } : {}
+    }
+    return (
+      <AuthProvider
+        authUrl={`https://my-backend.com/api/user`}
+        reqOptions={reqOptions}
+      >
+        <View style={styles.container}>
+          <Text style={styles.welcome}>
+            Welcome to React Native!
+          </Text>
+          <AuthConsumer>
+            {({isLoading, userInfo, error}) => {
+              if (isLoading) {
+                return (<ActivityIndicator />);
+              }
+              if (error) {
+                return (<Text> Unexpected </Text>);
+              }
+              if (!userInfo) {
+                return (<LoginComponent />);
+              }
+              return (<HomeComponent />);
+            }}
+          </AuthConsumer>
+        </View>
+      </AuthProvider>
+    );
+  }
+}
+
+```
 
 ## Plug-n-play with existing auth providers
 
@@ -354,7 +399,7 @@ It will render as `<span>Please login</span>` if the user's token is invalid and
 
 ## How it works
 
-![How it works](https://raw.githubusercontent.com/hasura/check-auth/master/how-it-works.png?token=AX7uzNQcZ7FW-RTgFVzkUKaKLM_U26MQks5a4GzLwA%3D%3D)
+![How it works](./how-it-works.png?raw=true)
 
 1. The `AuthProvider` component uses the `authUrl` and `reqOptions` information given to it to make an API call
 2. While the API call is being made, it sets the context value to have `isLoading` to `true`.
@@ -438,3 +483,8 @@ A demo-app is located inside `src/demo` directory, which you can use to test you
 `npm run build` or `yarn run build`
 
 Produces production version of library under the `build` folder.
+
+## Maintainers
+
+This project has come out of the work at [hasura.io](https://hasura.io). 
+Current maintainers [@Praveen](https://twitter.com/praveenweb), [@Karthik](https://twitter.com/k_rthik1991), [@Rishi](https://twitter.com/_rishichandra). 
