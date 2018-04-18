@@ -12,7 +12,7 @@ const reqOptions = {
   'headers': {
     'Content-Type': 'application/json'
   },
-}
+};
 
 const App = (props) => (
   <AuthProvider authUrl = { authEndpoint } reqOptions={ reqOptions }>

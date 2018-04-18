@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Provider, defaultState } from '../context';
 import PropTypes from 'prop-types';
-import fetch from 'isomorphic-fetch';
+// import fetch from 'isomorphic-fetch';
 
 class AuthProvider extends React.Component  {
   constructor() {

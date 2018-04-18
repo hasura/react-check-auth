@@ -1,4 +1,4 @@
-# react-check-auth
+# check-auth
 
 This tiny react component helps you make auth checks declarative in your react or react-native app.
 
@@ -11,56 +11,66 @@ This component uses React 16's new context API. Considering the size of this com
 
 ## Example 1: Creating a header that shows a "Welcome user" or a Login button
 ``` javascript
-  import {AuthConsumer} from 'react-check-auth';
+  import {AuthProvider, AuthConsumer} from 'check-auth';
 
   const Header = () => (
-    <div>
+    <AuthProvider authEndpoint={ 'http://localhost:8080/user/info' }>
       // Some header items 
       // ...
       
       // Now the part that depends on the user being logged in
       <AuthConsumer> 
         {({userInfo}) => { 
-          if (userInfo) { 
-            return (<span>Welcome {userInfo.username}</span> )
-          }
-          return (<a href={'https://mywebsite.com/login'}>Login</a>)
+
+          // .. code to check if userInfo is not null and return the corresponding jsx
+          ...
+
+          // If userinfo doesn't exist return the corresponding jsx
         }}
        </AuthConsumer>
-    </div>
+    </AuthProvider>
   );
 ```
 
 ## Example 2: Routing with react-router based on the user being logged in
 ``` javascript
-  import {AuthConsumer} from 'react-check-auth';
+  import {AuthProvider, AuthConsumer} from 'check-auth';
+
   const Main = () => (
-    <AuthConsumer>
-      {({userInfo, isLoading, error}) => {
-      if (userInfo) {
-        return (<Route path='/home' component={Home}/>);
-      } else if (isLoading) {
-        return (...)
-      } else {
-        return <Route path='/error' component={Error}/>
-      }
-    </AuthConsumer>
+    <AuthProvider authEndpoint={ 'http://localhost:8080/user/info' }>
+      // Some header items 
+      // ...
+
+      <AuthConsumer>
+
+        {({userInfo, isLoading, error}) => {
+
+          // If userInfo is not null
+          return (<Route path='/home' component={Home}/>);
+
+          // If the request is being fetched
+          return (...)
+
+          // If error occurs
+          return <Route path='/error' component={Error}/>
+        }
+
+      </AuthConsumer>
+    </AuthProvider>
 );
 ```
-
-
 
 ## Installation
 
 ``` bash
-$ npm install --save react-check-auth
+$ npm install --save check-auth
 ```
 
 ## Simple Usage
 
 ``` javascript
   import React from 'react';
-  import {AuthProvider, AuthConsumer} from 'react-check-auth';
+  import {AuthProvider, AuthConsumer} from 'check-auth';
 
   const App = () => (
     <div>
@@ -96,7 +106,7 @@ The hard part about showing user information or Login button is that your react 
 
 ``` javascript
   import React from 'react';
-  import { AuthProvider, AuthConsumer } from 'react-check-auth';
+  import { AuthProvider, AuthConsumer } from 'check-auth';
   
 
   const Header = () => (
@@ -253,14 +263,14 @@ It will render as `<span>Please login</span>` if the user's token is invalid and
 
 ## How it works
 
-![How it works](https://raw.githubusercontent.com/hasura/react-check-auth/master/how-it-works.png?token=AX7uzNQcZ7FW-RTgFVzkUKaKLM_U26MQks5a4GzLwA%3D%3D)
+![How it works](https://raw.githubusercontent.com/hasura/check-auth/master/how-it-works.png?token=AX7uzNQcZ7FW-RTgFVzkUKaKLM_U26MQks5a4GzLwA%3D%3D)
 
 ## Contributing
 
 Clone repo
 
 ````
-git clone https://github.com/hasura/react-check-auth.git
+git clone https://github.com/hasura/check-auth.git
 ````
 
 Install dependencies
