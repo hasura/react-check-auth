@@ -3,31 +3,29 @@
 `check-auth` is a tiny react component helps you make auth checks declarative in your react or react-native app.
 Any component can declaratively toggle based on whether the user is logged in or not.
 
-This component uses React 16's new context API. This component is just ~100LOC, it's ideal to use as boilerplate/reference of using the new context API too to pass information from a component to arbitrarily deep child components.
+This component uses [React 16's new context API](https://reactjs.org/docs/context.html) and is just ~100 LOC. It can also serve as a boilerplate for getting familiar with using the context API to pass information from a parent component to arbitrarily deep child components.
 
 # Motivation
 
-In a typical app UI, once the user logs in, different components in the application will display different infomration depending on whether the user is logged in or not. For example, a "welcome user" label or a "login button" on a Header. 
+In a typical app UI, depending on whether the user logs in, components in the application display different infomration.
 
-More commonly, routing or certain app components need to be protected. For example, `/home` should redirect to `/login` if the user is not logged in and `/login` should redirect to `/home` if the user is logged in.
+For example, a "welcome user" label or a "login button" on a header. Or using this information with routing, `/home` should redirect to `/login` if the user is not logged in, and `/login` should redirect to `/home` if the user is logged in.
 
 ## Before `check-auth`
 
-The *irritating* work required to implement this is that:
-1. On load, your app must make a request to some kind of a verifyUser or a fetchUser endpoint to check if the existing persisted token/cookie is available and valid
-2. You need to store that information in app state and pass it as a prop all through your component tree just so that that child components can access it
-3. Or you can use something like `redux` to store the state and `connect()` any component that needs this information
+1. On load, your app must make a request to some kind of a `/verifyUser` or a `/fetchUser` endpoint to check if the existing persisted token/cookie is available and valid.
+2. You need to store that information in app state and pass it as a prop all through your component tree just so that that child components can access it or use `redux` to store the state and `connect()` the consuming component.
 
 ## After `check-auth`
 
 1. You specify the `authUrl` endpoint as a prop to a wrapper component called `<AuthProvider`.
-2. You access logged-in information using a child component called `<AuthConsumer>` that you can use anywhere in the app
+2. You access logged-in information by wrapping your react component/element in `<AuthConsumer>` that has the latest props.
 
 You don't need to make an API request, or pass props around, or manage state/reducers/connections in your app.
 
 # Examples
 
-## Example 0: Setup for web (if signin/login had set a cookie)
+## Example 0: Setup for web
 
 Wrap your react app in a `AuthProvider` component that has an endpoint to fetch basic user information. This works because if the user had logged in, a cookie would already be present. For using authorization headers, check the docs after the examples.
 
@@ -353,55 +351,10 @@ Lets assume we have an endpoint on the backend `/api/check_token` which reads a 
 
 It will render as `<span>Please login</span>` if the user's token is invalid and if the token is a valid one it will render <span>Hello username</span>
 
-### Using with React Native
-
-In case of React Native, you need to send the Authorization header to the `<AuthProvider>` since cookies are not cached in React Native. Rest of the workflow is exactly the same as React.
-
-``` javascript
-
-import { AuthProvider, AuthConsumer } from 'react-vksci123';
-
-export default class App extends Component<Props> {
-  render() {
-    const sessionToken = AsyncStorage.getItem("@mytokenkey");
-    const reqOptions = {
-      "method": "GET",
-      "headers": sessionToken ? { "Authorization" : `Bearer ${sessionToken}` } : {}
-    }
-    return (
-      <AuthProvider
-        authUrl={`https://my-backend.com/api/user`}
-        reqOptions={reqOptions}
-      >
-        <View style={styles.container}>
-          <Text style={styles.welcome}>
-            Welcome to React Native!
-          </Text>
-          <AuthConsumer>
-            {({isLoading, userInfo, error}) => {
-              if (isLoading) {
-                return (<ActivityIndicator />);
-              }
-              if (error) {
-                return (<Text> Unexpected </Text>);
-              }
-              if (!userInfo) {
-                return (<LoginComponent />);
-              }
-              return (<HomeComponent />);
-            }}
-          </AuthConsumer>
-        </View>
-      </AuthProvider>
-    );
-  }
-}
-
-```
 
 ## How it works
 
-![How it works](./how-it-works.png?raw=true)
+![How it works](https://raw.githubusercontent.com/hasura/check-auth/master/how-it-works.png?token=AX7uzNQcZ7FW-RTgFVzkUKaKLM_U26MQks5a4GzLwA%3D%3D)
 
 1. The `AuthProvider` component uses the `authUrl` and `reqOptions` information given to it to make an API call
 2. While the API call is being made, it sets the context value to have `isLoading` to `true`.
@@ -485,8 +438,3 @@ A demo-app is located inside `src/demo` directory, which you can use to test you
 `npm run build` or `yarn run build`
 
 Produces production version of library under the `build` folder.
-
-## Maintainers
-
-This project has come out of the work at [hasura.io](https://hasura.io). 
-Current maintainers [@Praveen](https://twitter.com/praveenweb), [@Karthik](https://twitter.com/k_rthik1991), [@Rishi](https://twitter.com/_rishichandra). 
