@@ -330,7 +330,7 @@ It will render as `<span>Please login</span>` if the user's token is invalid and
 
 ## How it works
 
-![How it works](https://raw.githubusercontent.com/hasura/check-auth/master/how-it-works.png?token=AX7uzNQcZ7FW-RTgFVzkUKaKLM_U26MQks5a4GzLwA%3D%3D)
+![How it works](./how-it-works.png?raw=true)
 
 1. The `AuthProvider` component uses the `authUrl` and `reqOptions` information given to it to make an API call
 2. While the API call is being made, it sets the context value to have `isLoading` to `true`.
