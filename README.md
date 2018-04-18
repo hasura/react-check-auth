@@ -4,23 +4,24 @@ This tiny react component helps you make auth checks declarative in your react o
 
 
 The use-case is when:
-1. the authentication is already done and you have a cookie or a header and 
+1. the authentication is already done and you have a cookie or a header and
 2. you want components arbitrarily spread somewhere in your app to be able to toggle based on whether the user is logged in or not
 
 This component uses React 16's new context API. Considering the size of this component, it's ideal to use a boilerplate/reference of using the new context API too!
 
 ## Example 1: Creating a header that shows a "Welcome user" or a Login button
+
 ``` javascript
   import {AuthProvider, AuthConsumer} from 'check-auth';
 
   const Header = () => (
     <AuthProvider authEndpoint={ 'http://localhost:8080/user/info' }>
-      // Some header items 
+      // Some header items
       // ...
-      
+
       // Now the part that depends on the user being logged in
-      <AuthConsumer> 
-        {({userInfo}) => { 
+      <AuthConsumer>
+        {({userInfo}) => {
 
           // .. code to check if userInfo is not null and return the corresponding jsx
           ...
@@ -33,12 +34,13 @@ This component uses React 16's new context API. Considering the size of this com
 ```
 
 ## Example 2: Routing with react-router based on the user being logged in
+
 ``` javascript
   import {AuthProvider, AuthConsumer} from 'check-auth';
 
   const Main = () => (
     <AuthProvider authEndpoint={ 'http://localhost:8080/user/info' }>
-      // Some header items 
+      // Some header items
       // ...
 
       <AuthConsumer>
@@ -63,6 +65,7 @@ This component uses React 16's new context API. Considering the size of this com
 ## Installation
 
 ``` bash
+
 $ npm install --save check-auth
 ```
 
@@ -75,16 +78,16 @@ $ npm install --save check-auth
   const App = () => (
     <div>
      <AuthProvider authUrl={authUrl} reqObj={reqObj}>
-      <AuthConsumer> 
-        { ({ isLoading, userInfo, error }) => { 
-          if ( isLoading ) { 
+      <AuthConsumer>
+        { ({ isLoading, userInfo, error }) => {
+          if ( isLoading ) {
             return ( <span>Loading...</span> )
           }
-          return ( !userInfo ? 
+          return ( !userInfo ?
             (<div>
               <a href={'https://auth.commercialization66.hasura-app.io/ui?redirect_url=http://localhost:3000'}>Login</a>
             </div>)
-            : 
+            :
             (<div>
               {Hello ${ userInfo.username }}
             </div>) );
@@ -101,13 +104,13 @@ $ npm install --save check-auth
 
 ### Frontend Session Management
 
-In a typical web ui, the header component of your application will have navigation links, signup/signin links or logged in user's profile information, depending on whether the user is logged in or not. 
-The hard part about showing user information or Login button is that your react app needs to make an Auth API call to fetch session information, maintain state and boilerplate code has to be written to handle this. You also need to make sure that state is available anywhere within your child components as well. 
+In a typical web ui, the header component of your application will have navigation links, signup/signin links or logged in user's profile information, depending on whether the user is logged in or not.
+The hard part about showing user information or Login button is that your react app needs to make an Auth API call to fetch session information, maintain state and boilerplate code has to be written to handle this. You also need to make sure that state is available anywhere within your child components as well.
 
 ``` javascript
   import React from 'react';
   import { AuthProvider, AuthConsumer } from 'check-auth';
-  
+
 
   const Header = () => (
     <div>
@@ -115,29 +118,29 @@ The hard part about showing user information or Login button is that your react 
         <li><a href="/">Home</a></li>
         <li><a href="/about">About Us</a></li>
         <AuthProvider authUrl={authUrl}>
-        <AuthConsumer> 
-        { ({ isLoading, userInfo, error }) => { 
-          if ( isLoading ) { 
-            return ( <span>Loading...</span> )
-          }
-          if ( userInfo ) {
-            return (
-              <li>
-                {Hello ${ userInfo.username }}
-              </li) 
-            );
-          } else {
-            return (
-              <li>
-                <a href="/login">Login</a>
-              </li>
-            );
-          }
-        }}
-        </AuthConsumer>
+          <AuthConsumer>
+            { ({ isLoading, userInfo, error }) => {
+              if ( isLoading ) {
+                return ( <span>Loading...</span> )
+              }
+              if ( userInfo ) {
+                return (
+                  <li>
+                    {Hello ${ userInfo.username }}
+                  </li)
+                );
+              } else {
+                return (
+                  <li>
+                    <a href="/login">Login</a>
+                  </li>
+                );
+              }
+            }}
+          </AuthConsumer>
         </AuthProvider>
       </ul>
-      
+
     </div>
   );
 ```
@@ -167,16 +170,16 @@ And inside your App.js component render, you can wrap it entirely with <CheckAut
 ``` javascript
 render () {
    <AuthProvider authUrl={authUrl}>
-    <CheckAuth> 
-      { ({ isLoading, userInfo, error }) => { 
-        if ( isLoading ) { 
+    <AuthConsumer>
+      { ({ isLoading, userInfo, error }) => {
+        if ( isLoading ) {
           return ( <span>Loading...</span> )
         }
-        return ( !userInfo ? 
+        return ( !userInfo ?
           (<div>
             Please Login
           </div>)
-          : 
+          :
           (<div>
             {Hello ${ userInfo.username }}
             <Route component={myApp} />
@@ -199,7 +202,7 @@ Hasura's Auth API can be integrated with this module with a simple auth get endp
   // pass the above reqObject to CheckAuth
   <AuthProvider authUrl={authEndpoint}>
     <AuthConsumer>
-    { ({ isLoading, userInfo, error }) => { 
+    { ({ isLoading, userInfo, error }) => {
       // your implementation here
     } }
     </AuthConsumer>
@@ -219,7 +222,7 @@ Hasura's Auth API can be integrated with this module with a simple auth get endp
   // pass the above reqObject to CheckAuth
   <AuthProvider authUrl={authUrl} reqObject={reqObject}>
     <AuthConsumer>
-    { ({ isLoading, userInfo, error }) => { 
+    { ({ isLoading, userInfo, error }) => {
       // your implementation here
     } }
     </AuthConsumer>
@@ -234,7 +237,7 @@ Lets assume we have an endpoint on the backend `/api/check_token` which reads a 
 
 ```
   const authEndpoint = 'http://localhost:8080/api/check_token';
-  const reqOptions = { 
+  const reqOptions = {
     'method': 'GET',
     'headers': {
       'Content-Type': 'application/json',
@@ -260,45 +263,44 @@ Lets assume we have an endpoint on the backend `/api/check_token` which reads a 
 
 It will render as `<span>Please login</span>` if the user's token is invalid and if the token is a valid one it will render <span>Hello username</span>
 
+### Using with React Native
+
+This library works with React Native exactly as it does with React. Just wrap your `Root` inside `<AuthProvider>` and you can use `<AuthConsumer>` in the children components of any depth.
+
+``` javascript
+
+import { AuthProvider, AuthConsumer } from 'react-vksci123';
+
+export default class App extends Component<Props> {
+  render() {
+    return (
+      <AuthProvider authUrl={`https://auth.conversion36.hasura-app.io/v1/user/info`}>
+        <View style={styles.container}>
+          <Text style={styles.welcome}>
+            Welcome to React Native!
+          </Text>
+          <AuthConsumer>
+            {({isLoading, userInfo, error}) => {
+              if (isLoading) {
+                return (<ActivityIndicator />);
+              }
+              if (error) {
+                return (<Text> Unexpected </Text>);
+              }
+              if (!userInfo) {
+                return (<LoginComponent />);
+              }
+              return (<HomeComponent />);
+            }}
+          </AuthConsumer>
+        </View>
+      </AuthProvider>
+    );
+  }
+}
+
+```
 
 ## How it works
 
-![How it works](https://raw.githubusercontent.com/hasura/check-auth/master/how-it-works.png?token=AX7uzNQcZ7FW-RTgFVzkUKaKLM_U26MQks5a4GzLwA%3D%3D)
-
-## Contributing
-
-Clone repo
-
-````
-git clone https://github.com/hasura/check-auth.git
-````
-
-Install dependencies
-
-`npm install` or `yarn install`
-
-Start development server
-
-`npm start` or `yarn start`
-
-Runs the demo app in development mode.
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-### Library files
-
-All library files are located inside `src/lib`  
-
-### Demo app
-
-Is located inside `src/demo` directory, here you can test your library while developing
-
-### Testing
-
-`npm run test` or `yarn run test`
-
-### Build library
-
-`npm run build` or `yarn run build`
-
-Produces production version of library under the `build` folder.
-
+![How it works](https://github.com/hasura/react-check-auth/blob/master/how-it-works.png)
