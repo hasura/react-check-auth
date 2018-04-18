@@ -164,11 +164,11 @@ The `AuthProvider` takes a required prop called `authUrl` and an optional prop c
 <AuthProvider authUrl="https://my-backend.com/api/user" reqOptions={requestOptionsObject} />
 ```
 
-### `authUrl` :: String
+#### `authUrl` :: String
 Should be a valid HTTP endpoint. Can be an HTTP endpoint of any method.
 
 
-### `reqOptions` :: Object
+#### `reqOptions` :: Object
 Should be a valid `fetch` options object as per https://github.github.io/fetch/#options.
 
 **Note: This is an optional prop that does not need to be specified if your `authUrl` endpoint is a GET endpoint that accepts cookies.**
@@ -223,8 +223,34 @@ Default value that ensures cookies get sent to a `GET` endpoint:
 
 ## Consuming auth state with `<AuthConsumer>`
 
-...
+Any react component or element can be wrapped with an `<AuthConsumer>` to consume the latest contextValue. You must write your react code inside a function that accepts the latest contextValue. Whenver the contextValue is updated then the AuthComponent is automatically re-rendered.
 
+For example,
+```javascript
+<AuthConsumer>
+  {(props) => {
+    
+    props.userInfo = {..}        // <request-object> returned by the API
+    props.isLoading = true/false // if the API has not returned yet
+    props.error = {..}           // <error-object> if the API returned a non-200 or the API call failed
+  }}
+</AuthConsumer>
+```
+
+#### `props.userInfo` :: JSON
+
+If the API call returned a 200 meaning that the current session is valid, `userInfo` contains <request-object> as returned by the API.
+
+If the API call returned a non-200 meaning that the current session is absent or invalid, `userInfo` is set to `null`.
+
+#### `props.isLoading` :: Boolean
+
+If the API call has not returned yet, `isLoading: true`. If the API call has not been made yet, or has completed then `isLoading: false`.
+
+
+#### `props.error` :: JSON
+
+If the API call returned a non-200 or there was an error in making the API call itself, `error` contains the parsed JSON value.
 
 
 ## Refresh state (eg: logout)
@@ -327,6 +353,51 @@ Lets assume we have an endpoint on the backend `/api/check_token` which reads a 
 
 It will render as `<span>Please login</span>` if the user's token is invalid and if the token is a valid one it will render <span>Hello username</span>
 
+### Using with React Native
+
+In case of React Native, you need to send the Authorization header to the `<AuthProvider>` since cookies are not cached in React Native. Rest of the workflow is exactly the same as React.
+
+``` javascript
+
+import { AuthProvider, AuthConsumer } from 'react-vksci123';
+
+export default class App extends Component<Props> {
+  render() {
+    const sessionToken = AsyncStorage.getItem("@mytokenkey");
+    const reqOptions = {
+      "method": "GET",
+      "headers": sessionToken ? { "Authorization" : `Bearer ${sessionToken}` } : {}
+    }
+    return (
+      <AuthProvider
+        authUrl={`https://my-backend.com/api/user`}
+        reqOptions={reqOptions}
+      >
+        <View style={styles.container}>
+          <Text style={styles.welcome}>
+            Welcome to React Native!
+          </Text>
+          <AuthConsumer>
+            {({isLoading, userInfo, error}) => {
+              if (isLoading) {
+                return (<ActivityIndicator />);
+              }
+              if (error) {
+                return (<Text> Unexpected </Text>);
+              }
+              if (!userInfo) {
+                return (<LoginComponent />);
+              }
+              return (<HomeComponent />);
+            }}
+          </AuthConsumer>
+        </View>
+      </AuthProvider>
+    );
+  }
+}
+
+```
 
 ## How it works
 
@@ -414,3 +485,8 @@ A demo-app is located inside `src/demo` directory, which you can use to test you
 `npm run build` or `yarn run build`
 
 Produces production version of library under the `build` folder.
+
+## Maintainers
+
+This project has come out of the work at [hasura.io](https://hasura.io). 
+Current maintainers [@Praveen](https://twitter.com/praveenweb), [@Karthik](https://twitter.com/k_rthik1991), [@Rishi](https://twitter.com/_rishichandra). 
