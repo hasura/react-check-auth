@@ -1,5 +1,55 @@
 # react-check-auth
 
+This tiny react component helps you make auth checks declarative in your react or react-native app.
+
+
+The use-case is when:
+1. the authentication is already done and you have a cookie or a header and 
+2. you want components arbitrarily spread somewhere in your app to be able to toggle based on whether the user is logged in or not
+
+This component uses React 16's new context API. Considering the size of this component, it's ideal to use a boilerplate/reference of using the new context API too!
+
+## Example 1: Creating a header that shows a "Welcome user" or a Login button
+``` javascript
+  import {AuthConsumer} from 'react-check-auth';
+
+  const Header = () => (
+    <div>
+      // Some header items 
+      // ...
+      
+      // Now the part that depends on the user being logged in
+      <AuthConsumer> 
+        {({userInfo}) => { 
+          if (userInfo) { 
+            return (<span>Welcome {userInfo.username}</span> )
+          }
+          return (<a href={'https://mywebsite.com/login'}>Login</a>)
+        }}
+       </AuthConsumer>
+    </div>
+  );
+```
+
+## Example 2: Routing with react-router based on the user being logged in
+``` javascript
+  import {AuthConsumer} from 'react-check-auth';
+  const Main = () => (
+    <AuthConsumer>
+      {({userInfo, isLoading, error}) => {
+      if (userInfo) {
+        return (<Route path='/home' component={Home}/>);
+      } else if (isLoading) {
+        return (...)
+      } else {
+        return <Route path='/error' component={Error}/>
+      }
+    </AuthConsumer>
+);
+```
+
+
+
 ## Installation
 
 ``` bash
