@@ -353,6 +353,51 @@ Lets assume we have an endpoint on the backend `/api/check_token` which reads a 
 
 It will render as `<span>Please login</span>` if the user's token is invalid and if the token is a valid one it will render <span>Hello username</span>
 
+### Using with React Native
+
+In case of React Native, you need to send the Authorization header to the `<AuthProvider>` since cookies are not cached in React Native. Rest of the workflow is exactly the same as React.
+
+``` javascript
+
+import { AuthProvider, AuthConsumer } from 'react-vksci123';
+
+export default class App extends Component<Props> {
+  render() {
+    const sessionToken = AsyncStorage.getItem("@mytokenkey");
+    const reqOptions = {
+      "method": "GET",
+      "headers": sessionToken ? { "Authorization" : `Bearer ${sessionToken}` } : {}
+    }
+    return (
+      <AuthProvider
+        authUrl={`https://my-backend.com/api/user`}
+        reqOptions={reqOptions}
+      >
+        <View style={styles.container}>
+          <Text style={styles.welcome}>
+            Welcome to React Native!
+          </Text>
+          <AuthConsumer>
+            {({isLoading, userInfo, error}) => {
+              if (isLoading) {
+                return (<ActivityIndicator />);
+              }
+              if (error) {
+                return (<Text> Unexpected </Text>);
+              }
+              if (!userInfo) {
+                return (<LoginComponent />);
+              }
+              return (<HomeComponent />);
+            }}
+          </AuthConsumer>
+        </View>
+      </AuthProvider>
+    );
+  }
+}
+
+```
 
 ## How it works
 
@@ -440,3 +485,8 @@ A demo-app is located inside `src/demo` directory, which you can use to test you
 `npm run build` or `yarn run build`
 
 Produces production version of library under the `build` folder.
+
+## Maintainers
+
+This project has come out of the work at [hasura.io](https://hasura.io). 
+Current maintainers [@Praveen](https://twitter.com/praveenweb), [@Karthik](https://twitter.com/k_rthik1991), [@Rishi](https://twitter.com/_rishichandra). 
