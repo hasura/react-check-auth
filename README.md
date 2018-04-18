@@ -1,63 +1,151 @@
 # check-auth
 
-This tiny react component helps you make auth checks declarative in your react or react-native app.
+`check-auth` is a tiny react component helps you make auth checks declarative in your react or react-native app.
+Any component can declaratively toggle based on whether the user is logged in or not.
 
+This component uses React 16's new context API. This component is just ~100LOC, it's ideal to use as boilerplate/reference of using the new context API too to pass information from a component to arbitrarily deep child components.
 
-The use-case is when:
-1. the authentication is already done and you have a cookie or a header and 
-2. you want components arbitrarily spread somewhere in your app to be able to toggle based on whether the user is logged in or not
+# Motivation
 
-This component uses React 16's new context API. Considering the size of this component, it's ideal to use a boilerplate/reference of using the new context API too!
+In a typical app UI, once the user logs in, different components in the application will display different infomration depending on whether the user is logged in or not. For example, a "welcome user" label or a "login button" on a Header. 
 
-## Example 1: Creating a header that shows a "Welcome user" or a Login button
+More commonly, routing or certain app components need to be protected. For example, `/home` should redirect to `/login` if the user is not logged in and `/login` should redirect to `/home` if the user is logged in.
+
+## Before `check-auth`
+
+The *irritating* work required to implement this is that:
+1. On load, your app must make a request to some kind of a verifyUser or a fetchUser endpoint to check if the existing persisted token/cookie is available and valid
+2. You need to store that information in app state and pass it as a prop all through your component tree just so that that child components can access it
+3. Or you can use something like `redux` to store the state and `connect()` any component that needs this information
+
+## After `check-auth`
+
+1. You specify the `authUrl` endpoint as a prop to a wrapper component called `<AuthProvider`.
+2. You access logged-in information using a child component called `<AuthConsumer>` that you can use anywhere in the app
+
+You don't need to make an API request, or pass props around, or manage state/reducers/connections in your app.
+
+# Examples
+
+## Example 0: Setup for web (if signin/login had set a cookie)
+
+Wrap your react app in a `AuthProvider` component that has an endpoint to fetch basic user information. This works because if the user had logged in, a cookie would already be present. For using authorization headers, check the docs after the examples.
+
+```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+
+import {AuthProvider} from "check-auth";
+import {Header, Main} from "./components";
+
+const App = () => (
+  <AuthProvider authUrl={'https://website.com/get/userInfo'}>
+    <div>
+      // The rest of your react app goes here
+      <Header />
+      <Main />
+    </div>
+  </AuthProvider>
+);
+
+ReactDOM.render(<App />, document.getElementById("root"));
+```
+
+## Example 1: Show a "welcome user" or a Login button
+
+Now, in any arbitrary component, like a Header, you can check if the user is currently logged in. Typically you would use this for either showing a "welcome" label or a login button.
+
 ``` javascript
-  import {AuthProvider, AuthConsumer} from 'check-auth';
+  import {AuthConsumer} from 'check-auth';
 
   const Header = () => (
-    <AuthProvider authEndpoint={ 'http://localhost:8080/user/info' }>
-      // Some header items 
-      // ...
-      
-      // Now the part that depends on the user being logged in
+    <div>      
+      // Use the AuthConsumer component to check 
+      // if userInfo is available
       <AuthConsumer> 
-        {({userInfo}) => { 
-
-          // .. code to check if userInfo is not null and return the corresponding jsx
-          ...
-
-          // If userinfo doesn't exist return the corresponding jsx
-        }}
+        {({userInfo, isLoading, error}) => ( 
+          userInfo ?
+            (<span>Hi {userInfo.username}</span>) :
+            (<a href="/login">Login</a>)
+        )}
        </AuthConsumer>
-    </AuthProvider>
+    </div>
   );
 ```
 
-## Example 2: Routing with react-router based on the user being logged in
+## Example 2: Redirect routes based on the user being logged in
+
+You can mix and match `check-auth` with other declarative components like routing:
+
 ``` javascript
-  import {AuthProvider, AuthConsumer} from 'check-auth';
+  import {AuthConsumer} from 'check-auth';
 
   const Main = () => (
-    <AuthProvider authEndpoint={ 'http://localhost:8080/user/info' }>
-      // Some header items 
-      // ...
+    <Router>
+      <Route path='/home' component={Home} />
+      <Route path ='/login' component={Login} />
+    </Router>
+   );
+   
+   const Home = () => {
+     return (
+       <AuthConsumer>
+         {({userInfo}) => {
 
-      <AuthConsumer>
-
-        {({userInfo, isLoading, error}) => {
-
-          // If userInfo is not null
-          return (<Route path='/home' component={Home}/>);
-
-          // If the request is being fetched
-          return (...)
-
-          // If error occurs
-          return <Route path='/error' component={Error}/>
-        }
-
-      </AuthConsumer>
-    </AuthProvider>
+           // Redirect the user to login if they are not logged in
+           if (!userInfo) {
+              return (<Redirect to='/login' />);
+           } 
+           
+           // Otherwise render the normal component
+           else {
+             return (<div>Welcome Home!</div>);
+           }
+         }}
+       </AuthConsumer>
+     );
+   }
 );
+```
+
+
+# Usage guide
+
+## Backend requirements
+
+These are the backend requirements that are assumed by `react-check-auth`.
+
+### 1) API endpoint to return user information
+
+An API request to fetch user information. It should take a cookie, or a header or a body for current session information.
+
+For example:
+```http
+GET https://my-backend.com/api/user
+Content-Type: application/json
+Cookie: <...>
+Authorization: Bearer <...>
+```
+
+### 2) Success or logged-in response
+
+If the user is logged in, the API should return a `200` status code with a `JSON` object.
+
+For example:
+```json
+{
+  "username": "iamuser",
+  "id": 123
+}
+```
+
+### 3) Not logged-in response
+
+If the user is not logged-in, the API should return a **non `200`** status code:
+
+For example:
+```http
+Status: 403
 ```
 
 ## Installation
@@ -66,127 +154,105 @@ This component uses React 16's new context API. Considering the size of this com
 $ npm install --save check-auth
 ```
 
-## Simple Usage
+## Set up `AuthProvider`
 
-``` javascript
-  import React from 'react';
-  import {AuthProvider, AuthConsumer} from 'check-auth';
+The `AuthProvider` component should be at the top of the component tree so that any other component in the app can consume the `userInfo` information.
 
-  const App = () => (
-    <div>
-     <AuthProvider authUrl={authUrl} reqObj={reqObj}>
-      <AuthConsumer> 
-        { ({ isLoading, userInfo, error }) => { 
-          if ( isLoading ) { 
-            return ( <span>Loading...</span> )
-          }
-          return ( !userInfo ? 
-            (<div>
-              <a href={'https://auth.commercialization66.hasura-app.io/ui?redirect_url=http://localhost:3000'}>Login</a>
-            </div>)
-            : 
-            (<div>
-              {Hello ${ userInfo.username }}
-            </div>) );
-        }}
-       </AuthConsumer>
-      </AuthProvider>
-    </div>
-  );
+The `AuthProvider` takes a required prop called `authUrl` and an optional prop called `reqOptions`.
+
+```javascript
+<AuthProvider authUrl="https://my-backend.com/api/user" reqOptions={requestOptionsObject} />
 ```
 
-## Use Cases
+### `authUrl` :: String
+Should be a valid HTTP endpoint. Can be an HTTP endpoint of any method.
 
-`React Check Auth` can be applied to common use cases like:
 
-### Frontend Session Management
+### `reqOptions` :: Object
+Should be a valid `fetch` options object as per https://github.github.io/fetch/#options.
 
-In a typical web ui, the header component of your application will have navigation links, signup/signin links or logged in user's profile information, depending on whether the user is logged in or not. 
-The hard part about showing user information or Login button is that your react app needs to make an Auth API call to fetch session information, maintain state and boilerplate code has to be written to handle this. You also need to make sure that state is available anywhere within your child components as well. 
+**Note: This is an optional prop that does not need to be specified if your `authUrl` endpoint is a GET endpoint that accepts cookies.**
+
+Default value that ensures cookies get sent to a `GET` endpoint:
+```json
+{ 
+  "method": "GET",
+  "credentials": "include",
+  "headers": {
+    "Content-Type": "application/json"
+  },  
+}
+```
+
+### Example 1: Use a GET endpoint with cookies
 
 ``` javascript
   import React from 'react';
-  import { AuthProvider, AuthConsumer } from 'check-auth';
+  import {AuthProvider} from 'check-auth';
+
+  const authUrl = "https://my-backend.com/verifyAuth";
   
-
-  const Header = () => (
-    <div>
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About Us</a></li>
-        <AuthProvider authUrl={authUrl}>
-        <AuthConsumer> 
-        { ({ isLoading, userInfo, error }) => { 
-          if ( isLoading ) { 
-            return ( <span>Loading...</span> )
-          }
-          if ( userInfo ) {
-            return (
-              <li>
-                {Hello ${ userInfo.username }}
-              </li) 
-            );
-          } else {
-            return (
-              <li>
-                <a href="/login">Login</a>
-              </li>
-            );
-          }
-        }}
-        </AuthConsumer>
-        </AuthProvider>
-      </ul>
-      
-    </div>
+  const App = () => (
+    <AuthProvider authUrl={authUrl}>
+      // The rest of your app goes here
+    </AuthProvider>
   );
 ```
 
-### Using with React Router
-
-With React Router v4, you can call the Route inside your CheckAuth component or wrap your entire application with CheckAuth, like this -
+### Example 2: Use a GET endpoint with a header
 
 ``` javascript
   import React from 'react';
-  import { Route, Switch } from 'react-router-dom';
+  import {AuthProvider} from 'check-auth';
 
-  import App from './App.js'
-  import SigninPage from './SigninPage';
-
-  export default () => (
-    <Switch>
-      <Route path='/home' component={App}/>
-      <Route path='/signin' component={SiginPage}/>
-    </Switch>
-);
-
+  const authUrl = "https://my-backend.com/verifyAuth";
+  const reqOptions = { 
+    'method': 'GET',
+    'headers': {
+      'Content-Type': 'application/json',
+      'Authorization' : 'Bearer ' + window.localStorage.myAuthToken
+    },  
+  }; 
+  
+  const App = () => (
+    <AuthProvider authUrl={authUrl} reqOptions={reqOptions}>
+      // The rest of your app goes here
+    </AuthProvider>
+  );
 ```
 
-And inside your App.js component render, you can wrap it entirely with <CheckAuth>,
+## Consuming auth state with `<AuthConsumer>`
 
-``` javascript
-render () {
-   <AuthProvider authUrl={authUrl}>
-    <CheckAuth> 
-      { ({ isLoading, userInfo, error }) => { 
-        if ( isLoading ) { 
-          return ( <span>Loading...</span> )
-        }
-        return ( !userInfo ? 
-          (<div>
-            Please Login
-          </div>)
-          : 
-          (<div>
-            {Hello ${ userInfo.username }}
-            <Route component={myApp} />
-          </div>) );
-      }}
-    </CheckAuth>
-  }
+...
+
+
+
+## Refresh state (eg: logout)
+
+If you implement a logout action in your app, the auth state needs to be updated. All you need to do is call the `refreshAuth()` function available as an argument in the renderProp function of the `AuthConsumer` component.
+
+For example:
+```javascript
+
+<AuthConsumer>
+  {(refreshAuth) => (
+    <button onClick={{
+      this.logout() // This is a promise that calls a logout API
+        .then(
+          () => refreshAuth()
+        );
+    }}>
+      Logout
+    </button>
+</AuthConsumer>  
 ```
 
-### Third-party Auth Providers
+This will re-run the call to `authUrl` and update all the child components accordingly.
+
+
+## Plug-n-play with existing auth providers
+
+All Auth backend providers provide an endpoint to verify a "session" and fetch user information. This package itself was motivated by making it easier to integrate Hasura's auth API into your react app and minimise boilerplate. That said this package is meant to be used with any auth provider, including your own.
 
 #### Hasura
 
@@ -194,7 +260,7 @@ Hasura's Auth API can be integrated with this module with a simple auth get endp
 
 ```
   // replace CLUSTER_NAME with your Hasura cluster name.
-  const authEndpoint = 'https://auth.[CLUSTER_NAME].hasura-app.io/v1/user/info';
+  const authEndpoint = 'https://auth.CLUSTER_NAME.hasura-app.io/v1/user/info';
 
   // pass the above reqObject to CheckAuth
   <AuthProvider authUrl={authEndpoint}>
@@ -206,6 +272,7 @@ Hasura's Auth API can be integrated with this module with a simple auth get endp
   </AuthProvider>
 ```
 
+Read the docs here.
 
 #### Firebase
 
@@ -265,12 +332,57 @@ It will render as `<span>Please login</span>` if the user's token is invalid and
 
 ![How it works](https://raw.githubusercontent.com/hasura/check-auth/master/how-it-works.png?token=AX7uzNQcZ7FW-RTgFVzkUKaKLM_U26MQks5a4GzLwA%3D%3D)
 
+1. The `AuthProvider` component uses the `authUrl` and `reqOptions` information given to it to make an API call
+2. While the API call is being made, it sets the context value to have `isLoading` to `true`.
+```json
+{
+  "userInfo": null,
+  "isLoading": true,
+  "error": null
+}
+```
+3. Once the API call returns, in the context value `isLoading` is set to `false' and:
+4. Once the API call returns, if the user is logged in, the AuthProvider sets the context to `userInfo: <response-object>`
+```json
+{
+  "userInfo": <response-object>,
+  "isLoading": false,
+  "error": null
+}
+```
+5. If the user is not logged in, in the context value, `userInfo` is set to `null` and `error` is set to the error response sent by the API, if the error is in JSON.
+```json
+{
+  "userInfo": null,
+  "isLoading": false,
+  "error": <error-response>
+}
+```
+6. If the API call fails for some other reason, `error` contains the information
+
+```json
+{
+  "userInfo": null,
+  "isLoading": false,
+  "error": <error-response>
+}
+```
+7. Whenever the contextValue is updated, any component that is wrapped with `AuthConsumer` will be re-rendered with the contextValue passed to it as an argument in the renderProp function:
+
+```javascript
+<AuthConsumer>
+  { ({userInfo, isLoading, error}) => {
+     return (...);
+  }}
+<AuthConsumer>
+```
+
 ## Contributing
 
 Clone repo
 
 ````
-git clone https://github.com/hasura/check-auth.git
+git clone https://github.com/hasura/react-check-auth.git
 ````
 
 Install dependencies
@@ -282,15 +394,16 @@ Start development server
 `npm start` or `yarn start`
 
 Runs the demo app in development mode.
+
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-### Library files
+### Source code
 
-All library files are located inside `src/lib`  
+The source code for the react components are located inside `src/lib`.  
 
 ### Demo app
 
-Is located inside `src/demo` directory, here you can test your library while developing
+A demo-app is located inside `src/demo` directory, which you can use to test your library while developing.
 
 ### Testing
 
@@ -301,4 +414,3 @@ Is located inside `src/demo` directory, here you can test your library while dev
 `npm run build` or `yarn run build`
 
 Produces production version of library under the `build` folder.
-
