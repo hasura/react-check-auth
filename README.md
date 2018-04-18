@@ -253,7 +253,7 @@ It will render as `<span>Please login</span>` if the user's token is invalid and
 
 ## How it works
 
-
+![How it works](https://raw.githubusercontent.com/hasura/react-check-auth/master/how-it-works.png?token=AX7uzNQcZ7FW-RTgFVzkUKaKLM_U26MQks5a4GzLwA%3D%3D)
 
 ## Contributing
 
