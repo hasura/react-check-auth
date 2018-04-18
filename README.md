@@ -279,8 +279,10 @@ export default class App extends Component<Props> {
       "headers": sessionToken ? { "Authorization" : `Bearer ${sessionToken}` } : {}
     }
     return (
-      <AuthProvider authUrl={`https://auth.conversion36.hasura-app.io/v1/user/info`}
-      reqOptions={reqOptions}>
+      <AuthProvider
+        authUrl={`https://auth.conversion36.hasura-app.io/v1/user/info`}
+        reqOptions={reqOptions}
+      >
         <View style={styles.container}>
           <Text style={styles.welcome}>
             Welcome to React Native!
