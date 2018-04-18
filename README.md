@@ -1,6 +1,6 @@
-# check-auth
+# react-check-auth
 
-`check-auth` is a tiny react component helps you make auth checks declarative in your react or react-native app.
+`react-check-auth` is a tiny react component helps you make auth checks declarative in your react or react-native app.
 Any component can declaratively toggle based on whether the user is logged in or not.
 
 This component uses React 16's new context API. This component is just ~100LOC, it's ideal to use as boilerplate/reference of using the new context API too to pass information from a component to arbitrarily deep child components.
@@ -11,14 +11,14 @@ In a typical app UI, once the user logs in, different components in the applicat
 
 More commonly, routing or certain app components need to be protected. For example, `/home` should redirect to `/login` if the user is not logged in and `/login` should redirect to `/home` if the user is logged in.
 
-## Before `check-auth`
+## Before `react-check-auth`
 
 The *irritating* work required to implement this is that:
 1. On load, your app must make a request to some kind of a verifyUser or a fetchUser endpoint to check if the existing persisted token/cookie is available and valid
 2. You need to store that information in app state and pass it as a prop all through your component tree just so that that child components can access it
 3. Or you can use something like `redux` to store the state and `connect()` any component that needs this information
 
-## After `check-auth`
+## After `react-check-auth`
 
 1. You specify the `authUrl` endpoint as a prop to a wrapper component called `<AuthProvider`.
 2. You access logged-in information using a child component called `<AuthConsumer>` that you can use anywhere in the app
@@ -35,7 +35,7 @@ Wrap your react app in a `AuthProvider` component that has an endpoint to fetch 
 import React from "react";
 import ReactDOM from "react-dom";
 
-import {AuthProvider} from "check-auth";
+import {AuthProvider} from "@hasura/react-check-auth";
 import {Header, Main} from "./components";
 
 const App = () => (
@@ -56,7 +56,7 @@ ReactDOM.render(<App />, document.getElementById("root"));
 Now, in any arbitrary component, like a Header, you can check if the user is currently logged in. Typically you would use this for either showing a "welcome" label or a login button.
 
 ``` javascript
-  import {AuthConsumer} from 'check-auth';
+  import {AuthConsumer} from '@hasura/react-check-auth';
 
   const Header = () => (
     <div>      
@@ -75,10 +75,10 @@ Now, in any arbitrary component, like a Header, you can check if the user is cur
 
 ## Example 2: Redirect routes based on the user being logged in
 
-You can mix and match `check-auth` with other declarative components like routing:
+You can mix and match `react-check-auth` with other declarative components like routing:
 
 ``` javascript
-  import {AuthConsumer} from 'check-auth';
+  import {AuthConsumer} from '@hasura/react-check-auth';
 
   const Main = () => (
     <Router>
@@ -151,7 +151,7 @@ Status: 403
 ## Installation
 
 ``` bash
-$ npm install --save check-auth
+$ npm install --save @hasura/react-check-auth
 ```
 
 ## Set up `AuthProvider`
@@ -188,7 +188,7 @@ Default value that ensures cookies get sent to a `GET` endpoint:
 
 ``` javascript
   import React from 'react';
-  import {AuthProvider} from 'check-auth';
+  import {AuthProvider} from '@hasura/react-check-auth';
 
   const authUrl = "https://my-backend.com/verifyAuth";
   
@@ -203,7 +203,7 @@ Default value that ensures cookies get sent to a `GET` endpoint:
 
 ``` javascript
   import React from 'react';
-  import {AuthProvider} from 'check-auth';
+  import {AuthProvider} from '@hasura/react-check-auth';
 
   const authUrl = "https://my-backend.com/verifyAuth";
   const reqOptions = { 
