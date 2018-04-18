@@ -1,0 +1,44 @@
+.app_wrapper {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.image_wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.image_wrapper img {
+  padding: 10px;
+}
+.header_wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.header_wrapper ul {
+  display: inline-block;
+  list-style: none;
+  width: 68%;
+  text-align: right;
+}
+.header_wrapper ul li {
+  display: inline-block;
+  padding: 20px;
+}
+.header_wrapper ul li span {
+  cursor: pointer;
+}
+
+.header_wrapper .header_left {
+  width: 30%;
+}
+.header_wrapper .header_left .header_logo_icon {
+  display: inline-block;
+  width: 30px;
+}
+.header_wrapper .header_left .header_logo_icon img {
+  width: 100%;
+}
