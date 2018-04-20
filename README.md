@@ -6,7 +6,7 @@ This component uses [React 16's new context API](https://reactjs.org/docs/contex
 
 ## Motivation
 
-In a typical app UI, depending on whether the user logs in, components in the application display different infomration.
+In a typical app UI, depending on whether the user logs in, components in the application display different information.
 
 For example, a "welcome user" label or a "login button" on a header. Or using this information with routing, `/home` should redirect to `/login` if the user is not logged in, and `/login` should redirect to `/home` if the user is logged in.
 
