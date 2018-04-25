@@ -1,13 +1,12 @@
 ## react-check-auth
 
 `react-check-auth` is a tiny react component helps you make auth checks declarative in your react or react-native app.
-Any component can declaratively toggle based on whether the user is logged in or not.
 
 This component uses [React 16's new context API](https://reactjs.org/docs/context.html) and is just ~100 LOC. It can also serve as a boilerplate for getting familiar with using the context API to pass information from a parent component to arbitrarily deep child components.
 
 ## Motivation
 
-In a typical app UI, depending on whether the user logs in, components in the application display different infomration.
+In a typical app UI, depending on whether the user logs in, components in the application display different information.
 
 For example, a "welcome user" label or a "login button" on a header. Or using this information with routing, `/home` should redirect to `/login` if the user is not logged in, and `/login` should redirect to `/home` if the user is logged in.
 
@@ -23,9 +22,9 @@ For example, a "welcome user" label or a "login button" on a header. Or using th
 
 You don't need to make an API request, or pass props around, or manage state/reducers/connections in your app.
 
-## Examples
+## Example
 
-### Example 0: Setup for web
+### 1) Add AuthProvider
 
 Wrap your react app in a `AuthProvider` component that has an endpoint to fetch basic user information. This works because if the user had logged in, a cookie would already be present. For using authorization headers, check the docs after the examples.
 
@@ -49,7 +48,7 @@ const App = () => (
 ReactDOM.render(<App />, document.getElementById("root"));
 ```
 
-### Example 1: Show a "welcome user" or a Login button
+### 2) Show a "welcome user" or a Login button
 
 Now, in any arbitrary component, like a Header, you can check if the user is currently logged in. Typically you would use this for either showing a "welcome" label or a login button.
 
@@ -71,7 +70,7 @@ Now, in any arbitrary component, like a Header, you can check if the user is cur
   );
 ```
 
-### Example 2: Redirect routes based on the user being logged in
+### 3) Redirect not-logged in users to /login
 
 You can mix and match `react-check-auth` with other declarative components like routing:
 
@@ -109,7 +108,7 @@ You can mix and match `react-check-auth` with other declarative components like 
 
 ## Usage guide
 
-### Backend requirements
+### I. Backend requirements
 
 These are the backend requirements that are assumed by `react-check-auth`.
 
@@ -146,13 +145,13 @@ For example:
 Status: 403
 ```
 
-### Installation
+### II. Installation
 
 ``` bash
 $ npm install --save @hasura/react-check-auth
 ```
 
-### Set up `AuthProvider`
+### III. Set up `AuthProvider`
 
 The `AuthProvider` component should be at the top of the component tree so that any other component in the app can consume the `userInfo` information.
 
@@ -219,7 +218,7 @@ Default value that ensures cookies get sent to a `GET` endpoint:
   );
 ```
 
-### Consuming auth state with `<AuthConsumer>`
+### IV. Consuming auth state with `<AuthConsumer>`
 
 Any react component or element can be wrapped with an `<AuthConsumer>` to consume the latest contextValue. You must write your react code inside a function that accepts the latest contextValue. Whenver the contextValue is updated then the AuthComponent is automatically re-rendered.
 
@@ -251,7 +250,7 @@ If the API call has not returned yet, `isLoading: true`. If the API call has not
 If the API call returned a non-200 or there was an error in making the API call itself, `error` contains the parsed JSON value.
 
 
-### Refresh state (eg: logout)
+### V. Refresh state (eg: logout)
 
 If you implement a logout action in your app, the auth state needs to be updated. All you need to do is call the `refreshAuth()` function available as an argument in the renderProp function of the `AuthConsumer` component.
 
@@ -273,9 +272,9 @@ For example:
 
 This will re-run the call to `authUrl` and update all the child components accordingly.
 
-### Using with React Native
+### VI. Using with React Native
 
-In case of React Native, you need to send the Authorization header to the `<AuthProvider>` since cookies are not cached in React Native. Rest of the workflow is exactly the same as React.
+Usage with React Native is exactly the same as with React. However you would typically use a Authorization header instead of cookies. Here's a quick example:
 
 ``` javascript
 
@@ -321,13 +320,13 @@ export default class App extends Component<Props> {
 
 ## Plug-n-play with existing auth providers
 
-All Auth backend providers provide an endpoint to verify a "session" and fetch user information. This package itself was motivated by making it easier to integrate Hasura's auth API into your react app and minimise boilerplate. That said this package is meant to be used with any auth provider, including your own.
+All Auth backend providers provide an endpoint to verify a "session" and fetch user information. This component was motivated from creating documentation for integrating Hasura's auth backend into a react app with minimum boilerplate. That said this package is meant to be used with any auth provider, including your own.
 
 ### Hasura
 
 Hasura's Auth API can be integrated with this module with a simple auth get endpoint  and can also be used to redirect the user to Hasura's Auth UI Kit in case the user is not logged in.
 
-```
+```javascript
   // replace CLUSTER_NAME with your Hasura cluster name.
   const authEndpoint = 'https://auth.CLUSTER_NAME.hasura-app.io/v1/user/info';
 
@@ -347,7 +346,7 @@ Read the docs here.
 
 `CheckAuth` can be integrated with Firebase APIs.
 
-```
+```javascript
   // replace API_KEY with your Firebase API Key and ID_TOKEN appropriately.
   const authUrl = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/getAccountInfo?key=[API_KEY]';
   const reqObject = { 'method': 'POST', 'payload': {'idToken': '[ID_TOKEN]'}, 'headers': {'content-type': 'application/json'}};
@@ -368,7 +367,7 @@ Read the docs here.
 
 Lets assume we have an endpoint on the backend `/api/check_token` which reads a header `x-access-token` from the request and provides with the associated user information
 
-```
+```javascript
   const authEndpoint = 'http://localhost:8080/api/check_token';
   const reqOptions = { 
     'method': 'GET',
