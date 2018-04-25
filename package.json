@@ -1,6 +1,6 @@
 {
   "name": "react-check-auth",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "Declaratively add auth protection anywhere in your react/react-native app",
   "main": "build/index.js",
   "scripts": {
