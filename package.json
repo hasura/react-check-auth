@@ -1,5 +1,5 @@
 {
-  "name": "@hasura/react-check-auth",
+  "name": "react-check-auth",
   "version": "0.1.0-alpha.0",
   "description": "Declaratively add auth protection anywhere in your react/react-native app",
   "main": "build/index.js",
