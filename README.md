@@ -1,6 +1,6 @@
 ## react-check-auth
 
-`react-check-auth` is a tiny react component helps you make auth checks declarative in your react or react-native app.
+`react-check-auth` is a tiny react component that helps you make auth checks declarative in your react or react-native app.
 
 This component uses [React 16's new context API](https://reactjs.org/docs/context.html) and is just ~100 LOC. It can also serve as a boilerplate for getting familiar with using the context API to pass information from a parent component to arbitrarily deep child components.
 
@@ -32,7 +32,7 @@ Wrap your react app in a `AuthProvider` component that has an endpoint to fetch 
 import React from "react";
 import ReactDOM from "react-dom";
 
-import {AuthProvider} from "@hasura/react-check-auth";
+import {AuthProvider} from "react-check-auth";
 import {Header, Main} from "./components";
 
 const App = () => (
@@ -53,7 +53,7 @@ ReactDOM.render(<App />, document.getElementById("root"));
 Now, in any arbitrary component, like a Header, you can check if the user is currently logged in. Typically you would use this for either showing a "welcome" label or a login button.
 
 ``` javascript
-  import {AuthConsumer} from '@hasura/react-check-auth';
+  import {AuthConsumer} from 'react-check-auth';
 
   const Header = () => (
     <div>      
@@ -75,7 +75,7 @@ Now, in any arbitrary component, like a Header, you can check if the user is cur
 You can mix and match `react-check-auth` with other declarative components like routing:
 
 ``` javascript
-  import {AuthConsumer} from '@hasura/react-check-auth';
+  import {AuthConsumer} from 'react-check-auth';
 
   const Main = () => (
     <Router>
@@ -148,7 +148,7 @@ Status: 403
 ### II. Installation
 
 ``` bash
-$ npm install --save @hasura/react-check-auth
+$ npm install --save react-check-auth
 ```
 
 ### III. Set up `AuthProvider`
@@ -185,7 +185,7 @@ Default value that ensures cookies get sent to a `GET` endpoint:
 
 ``` javascript
   import React from 'react';
-  import {AuthProvider} from '@hasura/react-check-auth';
+  import {AuthProvider} from 'react-check-auth';
 
   const authUrl = "https://my-backend.com/verifyAuth";
   
@@ -200,7 +200,7 @@ Default value that ensures cookies get sent to a `GET` endpoint:
 
 ``` javascript
   import React from 'react';
-  import {AuthProvider} from '@hasura/react-check-auth';
+  import {AuthProvider} from 'react-check-auth';
 
   const authUrl = "https://my-backend.com/verifyAuth";
   const reqOptions = { 
