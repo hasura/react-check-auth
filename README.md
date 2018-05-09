@@ -165,8 +165,8 @@ The `AuthProvider` takes a required prop called `authUrl` and an optional prop c
 Should be a valid HTTP endpoint. Can be an HTTP endpoint of any method.
 
 
-##### `reqOptions` :: Object
-Should be a valid `fetch` options object as per https://github.github.io/fetch/#options.
+##### `reqOptions` :: Object || Function
+Should be or return a valid `fetch` options object as per https://github.github.io/fetch/#options.
 
 **Note: This is an optional prop that does not need to be specified if your `authUrl` endpoint is a GET endpoint that accepts cookies.**
 
