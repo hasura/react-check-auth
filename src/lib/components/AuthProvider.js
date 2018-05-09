@@ -33,13 +33,22 @@ class AuthProvider extends React.Component  {
   }
   fetchInfo() {
     const oThis = this;
-    const options = this.props.reqOptions || {
+    const { reqOptions } = this.props;
+
+    let options = {
       method: 'GET',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json'
       },
     };
+
+    if (!!reqOptions && typeof reqOptions === 'function') {
+      options = reqOptions();
+    } else if (!!reqOptions) {
+      options = reqOptions;
+    }
+
     this.toggleLoading();
     return fetch(this.props.authUrl, options)
       .then(function(response) {
@@ -67,7 +76,10 @@ class AuthProvider extends React.Component  {
 
 AuthProvider.propTypes = {
   authUrl: PropTypes.string.isRequired,
-  reqOptions: PropTypes.object,
+  reqOptions: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.object
+  ]),
   children: PropTypes.node
 };
 
