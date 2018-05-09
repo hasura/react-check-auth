@@ -3,6 +3,7 @@ import React from 'react';
 import { AuthProvider, AuthConsumer } from '../lib';
 import Enzyme, { shallow, render, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
+import fetchMock from 'fetch-mock';
 
 import { defaultState } from '../lib/context';
 
@@ -12,14 +13,22 @@ global.shallow = shallow;
 global.render = render;
 global.mount = mount;
 
+fetchMock.get('end:/user/info', { id: 'id', username: 'username' });
+fetchMock.post('end:/user/info', 404);
+fetchMock.get('end:/user/noauth', 401);
+fetchMock.get('end:/user/notJson', 'Not JSON');
+
+afterEach(fetchMock.reset);
+afterAll(fetchMock.restore);
+
 describe('Auth Provider Simple Rendering', () => {
   it('should render without throwing an error', () => {
-    expect(shallow(<AuthProvider authUrl="https://auth.abcd.io"><div>Hello Auth</div></AuthProvider>).exists(<div>Hello Auth</div>)).toBe(true)
+    expect(shallow(<AuthProvider authUrl="https://someapi.io/v1/user/info"><div>Hello Auth</div></AuthProvider>).exists(<div>Hello Auth</div>)).toBe(true)
   })
 })
 
 describe('Auth Provider Fetch', () => {
-  const authEndpoint = 'https://auth.commercialization66.hasura-app.io/v1/user/info';                                                                  
+  const authEndpoint = 'https://someapi.io/v1/user/info';
   const reqOptions = { 
     'method': 'GET',
     'credentials': 'include',
@@ -29,7 +38,7 @@ describe('Auth Provider Fetch', () => {
   };
 
   it('Test no session', async () => {
-    const successWrapper = shallow(<AuthProvider authUrl={ authEndpoint } reqOptions={ reqOptions }></AuthProvider>);
+    const successWrapper = shallow(<AuthProvider authUrl="https://someapi.io/v1/user/noauth" reqOptions={ reqOptions }></AuthProvider>);
     await successWrapper.instance().componentDidMount();
     expect(successWrapper.state(`userInfo`)).toBeNull()
   })
@@ -65,7 +74,7 @@ describe('Auth Provider Fetch', () => {
     newReqOpts.headers = {
       'Content-Type': 'application/json',
     };
-    const newAuthEndpoint = 'https://bcbab947-cfc1-4128-b907-1a814f5f1c84.mock.pstmn.io/t1';
+    const newAuthEndpoint = 'https://someapi.io/v1/user/notJson';
     const successWrapper = shallow(<AuthProvider authUrl={ newAuthEndpoint } reqOptions={ newReqOpts }></AuthProvider>);
     await successWrapper.instance().componentDidMount();
     expect(successWrapper.state(`error`)).toHaveProperty('name': 'FetchError');
@@ -77,10 +86,9 @@ describe('Auth Provider Fetch', () => {
     newReqOpts.headers = {
       'Content-Type': 'application/json',
     };
-    const newAuthEndpoint = 'https://bcbab947-cfc1-4128-b907-1a814f5f1c84.mock.pstmn.io/t2';
-    const successWrapper = shallow(<AuthProvider authUrl={ newAuthEndpoint } reqOptions={ newReqOpts }></AuthProvider>);
+    const successWrapper = shallow(<AuthProvider authUrl={ authEndpoint } reqOptions={ newReqOpts }></AuthProvider>);
     await successWrapper.instance().componentDidMount();
-    expect(successWrapper.state(`userInfo`)).toHaveProperty('Hello': 'World');
+    expect(successWrapper.state(`userInfo`)).toHaveProperty('username', 'username');
     successWrapper.state(`refreshAuth`)()
     expect(successWrapper.state(`userInfo`)).toBeNull();
   });
