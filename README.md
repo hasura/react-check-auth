@@ -218,6 +218,28 @@ Default value that ensures cookies get sent to a `GET` endpoint:
   );
 ```
 
+#### Example 3: Use a POST endpoint with updated token
+
+``` javascript
+  import React from 'react';
+  import {AuthProvider} from 'react-check-auth';
+
+  const authUrl = "https://my-backend.com/verifyAuth";
+  const reqOptions = () => { 
+    'method': 'POST',
+    'headers': {
+      'Content-Type': 'application/json',
+      'Authorization' : 'Bearer ' + window.localStorage.myAuthToken
+    },  
+  }; 
+  
+  const App = () => (
+    <AuthProvider authUrl={authUrl} reqOptions={reqOptions}>
+      // The rest of your app goes here
+    </AuthProvider>
+  );
+```
+
 ### IV. Consuming auth state with `<AuthConsumer>`
 
 Any react component or element can be wrapped with an `<AuthConsumer>` to consume the latest contextValue. You must write your react code inside a function that accepts the latest contextValue. Whenver the contextValue is updated then the AuthComponent is automatically re-rendered.
