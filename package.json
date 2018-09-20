@@ -1,5 +1,5 @@
 {
-  "name": "react-check-auth",
+  "name": "vksci123/react-check-auth",
   "version": "0.2.0-alpha.2",
   "description": "Declaratively add auth protection anywhere in your react/react-native app",
   "main": "build/index.js",
