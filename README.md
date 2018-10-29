@@ -13,7 +13,7 @@ For example, a "welcome user" label or a "login button" on a header. Or using th
 ### Before `react-check-auth`
 
 1. On load, your app must make a request to some kind of a `/verifyUser` or a `/fetchUser` endpoint to check if the existing persisted token/cookie is available and valid.
-2. You need to store that information in app state and pass it as a prop all through your component tree just so that that child components can access it or use `redux` to store the state and `connect()` the consuming component.
+2. You need to store that information in app state and pass it as a prop all through your component tree just so that, that child components can access it or use `redux` to store the state and `connect()` the consuming component.
 
 ### After `react-check-auth`
 
