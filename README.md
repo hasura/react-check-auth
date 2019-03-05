@@ -271,8 +271,22 @@ If the API call has not returned yet, `isLoading: true`. If the API call has not
 
 If the API call returned a non-200 or there was an error in making the API call itself, `error` contains the parsed JSON value.
 
+### V. Consuming auth state with `useCheckAuth()` hook
 
-### V. Refresh state (eg: logout)
+You can use `useCheckAuth()` hook. It returns the same values as `<AuthConsumer>`\`s render prop parameters.
+
+For example,
+```javascript
+import {useCheckAuth} from "react-check-auth";
+
+function User(props) {
+  const {userInfo, isLoading, error, refreshAuth} = useCheckAuth();
+  
+  return {...}
+}
+```
+
+### VI. Refresh state (eg: logout)
 
 If you implement a logout action in your app, the auth state needs to be updated. All you need to do is call the `refreshAuth()` function available as an argument in the renderProp function of the `AuthConsumer` component.
 
@@ -294,7 +308,7 @@ For example:
 
 This will re-run the call to `authUrl` and update all the child components accordingly.
 
-### VI. Using with React Native
+### VII. Using with React Native
 
 Usage with React Native is exactly the same as with React. However you would typically use a Authorization header instead of cookies. Here's a quick example:
 
