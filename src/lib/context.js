@@ -1,7 +1,7 @@
 import React from 'react';
 
 const defaultState = {
-  isLoading: false,
+  isLoading: true,
   userInfo: null,
   error: null,
   refreshAuth: () => true
