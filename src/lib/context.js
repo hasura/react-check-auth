@@ -7,6 +7,7 @@ const defaultState = {
   refreshAuth: () => true
 };
 
-const { Provider, Consumer } = React.createContext(defaultState);
+const AuthContext = React.createContext(defaultState);
+const { Provider, Consumer } = AuthContext;
 
-export { Provider, Consumer, defaultState };
+export { AuthContext, Provider, Consumer, defaultState };
