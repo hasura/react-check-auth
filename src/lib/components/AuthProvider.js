@@ -12,6 +12,7 @@ class AuthProvider extends React.Component  {
     this.fetchFail = this.fetchFail.bind(this);
     this.refreshAuth = this.refreshAuth.bind(this);
     this.state = { ...defaultState, refreshAuth: this.refreshAuth };
+    this.allowed_status_codes = [200, 201, 202];
   }
   componentDidMount () {
     if (this.props.authUrl) {
@@ -52,7 +53,7 @@ class AuthProvider extends React.Component  {
     this.toggleLoading();
     return fetch(this.props.authUrl, options)
       .then(function(response) {
-        if (response.status !== 200) {
+        if (!this.allowed_status_codes.includes(response.status)) {
           return response.json()
           .then((r) => {
             return Promise.reject(r)
